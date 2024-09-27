@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
-import { ClipMode, PointCloudOctree } from '../src';
+import { ClipMode, PointCloudOctree, Potree } from '../src';
 import { Viewer } from './viewer';
+import * as THREE from 'three';
 
 require('./main.css');
 
@@ -96,6 +97,35 @@ function setupPointCloud(version: 'v1' | 'v2', file: string, url: string): void 
         .catch(err => console.error(err));
 }
 
+const geometry = new THREE.SphereGeometry(0.01, 32, 32);
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const sphere = new THREE.Mesh(geometry, material);
+viewer.scene.add(sphere);
+
+const mouseMoveAction = (event: MouseEvent) => {
+    const raycaster = new THREE.Raycaster();
+    if(viewer.pointClouds.length > 0){
+        raycaster.setFromCamera(new THREE.Vector2((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1), viewer.camera);
+        const {ray} = raycaster;
+        
+            const pickPoint = Potree.pick(viewer.pointClouds,viewer.renderer,viewer.camera, ray);
+            if(pickPoint){
+                const pos = pickPoint.position;
+                if(pos){
+                    const dist = viewer.camera.position.distanceTo(pos);
+                    const coefficient = 0.5;
+                    const newScale = coefficient * dist;
+                    sphere.position.set(pos.x, pos.y, pos.z);
+                    sphere.scale.set(newScale,newScale,newScale);
+                    sphere.visible = true;
+                }
+            }else {
+                sphere.visible = false;
+            }
+        
+    }
+}
+
 function setupUI(cfg: PointCloudsConfig): void {
     const unloadBtn = createButton('Unload', () => {
         if (!loaded[cfg.version]) {
@@ -121,6 +151,8 @@ function setupUI(cfg: PointCloudsConfig): void {
     btnContainer.appendChild(unloadBtn);
     btnContainer.appendChild(loadBtn);
     btnContainer.appendChild(slider);
+
+    addEventListener("mousemove", mouseMoveAction);
 }
 
 examplePointClouds.forEach(setupUI);

@@ -11,7 +11,7 @@ export class Viewer {
   /**
    * The ThreeJS renderer used to render the scene.
    */
-  private renderer = new WebGLRenderer();
+  renderer = new WebGLRenderer();
   /**
    * Our scene which will contain the point cloud.
    */
@@ -27,12 +27,12 @@ export class Viewer {
   /**
    * Out potree instance which handles updating point clouds, keeps track of loaded nodes, etc.
    */
-  private potree_v1 = new Potree('v1');
-  private potree_v2 = new Potree('v2');
+  potree_v1 = new Potree('v1');
+  potree_v2 = new Potree('v2');
   /**
    * Array of point clouds which are in the scene and need to be updated.
    */
-  private pointClouds: PointCloudOctree[] = [];
+  pointClouds: PointCloudOctree[] = [];
   /**
    * The time (milliseconds) when `loop()` was last called.
    */
@@ -103,6 +103,10 @@ export class Viewer {
   add(pco: PointCloudOctree): void {
     this.scene.add(pco);
     this.pointClouds.push(pco);
+    if(this.pointClouds.length === 1){
+      this.camera.position.set(0, 0, -10);
+      this.cameraControls.target.copy(pco.position);
+    }
   }
 
   disposePointCloud(pointCloud: PointCloudOctree): void {
