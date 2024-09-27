@@ -1,3 +1,7 @@
+# ISSUE DEMONSTRATING PICK WINDOW ISSUE 
+This is a fork of pnext-three-loader,where i've setup a simple debug picker to demonstrate a picking issue with pick-window.
+It is setup so that picking through mousemove occurs, directly when a pointcloud is loaded in scene.
+
 # README
 
 This project is based on the core/loading parts of [Potree](http://potree.org/), converted to Typescript for usage directly in ThreeJS-based third-party applications.
